@@ -2262,7 +2262,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		} else {
 			actionstream<<player->getName()<<" tries to change password but "
 					<<"it fails"<<std::endl;
-			SendChatMessage(peer_id, L"*** Password change failed or inavailable.");
+			SendChatMessage(peer_id, L"*** Password change failed or unavailable.");
 		}
 	}
 	else if(command == TOSERVER_PLAYERITEM)
