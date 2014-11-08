@@ -2117,7 +2117,7 @@ bool Game::getServerContent(bool *aborted)
                 message << gettext("Engaging coffee break...");
             }
             else {
-                message << gettext("Placing user in Virtual Reality...");
+                message << gettext("Blaming Jordach...");
             }
 
 			if ((USE_CURL == 0) ||
