@@ -1039,7 +1039,7 @@ static void show_deathscreen(GUIFormSpecMenu **cur_formspec,
 		std::string(FORMSPEC_VERSION_STRING) +
 		SIZE_TAG
 		"bgcolor[#320000b4;true]"
-		"label[4.85,1.35;You died.]"
+		"label[4.85,1.35;You died!]"
 		"button_exit[4,3;3,0.5;btn_respawn;" + gettext("Respawn") + "]"
 		;
 
@@ -1092,7 +1092,7 @@ static void show_pause_menu(GUIFormSpecMenu **cur_formspec,
 
 	os << FORMSPEC_VERSION_STRING  << SIZE_TAG
 	   << "button_exit[4," << (ypos++) << ";3,0.5;btn_continue;"
-	   << wide_to_narrow(wstrgettext("Continue"))     << "]";
+	   << wide_to_narrow(wstrgettext("Back to Minetest"))     << "]";
 
 	if (!singleplayermode) {
 		os << "button_exit[4," << (ypos++) << ";3,0.5;btn_change_password;"
@@ -1100,13 +1100,13 @@ static void show_pause_menu(GUIFormSpecMenu **cur_formspec,
 	}
 
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_sound;"
-			<< wide_to_narrow(wstrgettext("Sound Volume")) << "]";
+			<< wide_to_narrow(wstrgettext("Volume")) << "]";
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_key_config;"
-			<< wide_to_narrow(wstrgettext("Change Keys"))  << "]";
+			<< wide_to_narrow(wstrgettext("Controls"))  << "]";
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_menu;"
-			<< wide_to_narrow(wstrgettext("Exit to Menu")) << "]";
+			<< wide_to_narrow(wstrgettext("Main Menu")) << "]";
 	os		<< "button_exit[4," << (ypos++) << ";3,0.5;btn_exit_os;"
-			<< wide_to_narrow(wstrgettext("Exit to OS"))   << "]"
+			<< wide_to_narrow(wstrgettext("Quit Minetest"))   << "]"
 			<< "textarea[7.5,0.25;3.9,6.25;;" << control_text << ";]"
 			<< "textarea[0.4,0.25;3.5,6;;" << "Minetest\n"
 			<< minetest_build_info << "\n"
@@ -2090,19 +2090,35 @@ bool Game::getServerContent(bool *aborted)
 		int progress = 0;
 
 		if (!client->itemdefReceived()) {
-			wchar_t *text = wgettext("Item definitions...");
-			progress = 0;
+			wchar_t *text = wgettext("Loading items...");
+			progress = 5;
 			draw_load_screen(text, device, guienv, font, dtime, progress);
 			delete[] text;
 		} else if (!client->nodedefReceived()) {
-			wchar_t *text = wgettext("Node definitions...");
-			progress = 25;
+			wchar_t *text = wgettext("Loading blocks...");
+			progress = 20;
 			draw_load_screen(text, device, guienv, font, dtime, progress);
 			delete[] text;
 		} else {
+            progress = 20 + client->mediaReceiveProgress() * 50 + 0.5;
 			std::stringstream message;
 			message.precision(3);
-			message << gettext("Media...");
+            // Enjoyable loading messages!
+            if (progress < 30) {
+                message << gettext("Coding next version...");
+            }
+            else if (progress < 50) {
+                message << gettext("Building world by hand...");
+            }
+            else if (progress < 70) {
+                message << gettext("Placing nyancats...");
+            }
+            else if (progress < 80) {
+                message << gettext("Engaging coffee break...");
+            }
+            else {
+                message << gettext("Blaming Jordach...");
+            }
 
 			if ((USE_CURL == 0) ||
 					(!g_settings->getBool("enable_remote_media_server"))) {
@@ -2117,7 +2133,7 @@ bool Game::getServerContent(bool *aborted)
 				message << " ( " << cur << cur_unit << " )";
 			}
 
-			progress = 50 + client->mediaReceiveProgress() * 50 + 0.5;
+			
 			draw_load_screen(narrow_to_wide(message.str().c_str()), device,
 					guienv, font, dtime, progress);
 		}
@@ -2471,7 +2487,7 @@ void Game::openConsole()
 
 void Game::toggleFreeMove(float *statustext_time)
 {
-	static const wchar_t *msg[] = { L"free_move disabled", L"free_move enabled" };
+	static const wchar_t *msg[] = { L"Flying disabled", L"Flying enabled" };
 
 	bool free_move = !g_settings->getBool("free_move");
 	g_settings->set("free_move", bool_to_cstr(free_move));
@@ -2494,7 +2510,7 @@ void Game::toggleFreeMoveAlt(float *statustext_time, float *jump_timer)
 
 void Game::toggleFast(float *statustext_time)
 {
-	static const wchar_t *msg[] = { L"fast_move disabled", L"fast_move enabled" };
+	static const wchar_t *msg[] = { L"Increased speed disabled", L"Increased speed enabled" };
 	bool fast_move = !g_settings->getBool("fast_move");
 	g_settings->set("fast_move", bool_to_cstr(fast_move));
 
@@ -2508,7 +2524,7 @@ void Game::toggleFast(float *statustext_time)
 
 void Game::toggleNoClip(float *statustext_time)
 {
-	static const wchar_t *msg[] = { L"noclip disabled", L"noclip enabled" };
+	static const wchar_t *msg[] = { L"Noclip disabled", L"Noclip enabled" };
 	bool noclip = !g_settings->getBool("noclip");
 	g_settings->set("noclip", bool_to_cstr(noclip));
 
@@ -3412,7 +3428,9 @@ void Game::handleDigging(GameRunData *runData,
 	}
 
 	if (params.diggable == false) {
-		// I guess nobody will wait for this long
+		// I guess nobody will wait for this long - Very humorous, but let's
+        // tell the user that.
+        statustext = L"You can't dig that right now.";
 		runData->dig_time_complete = 10000000.0;
 	} else {
 		runData->dig_time_complete = params.time;
