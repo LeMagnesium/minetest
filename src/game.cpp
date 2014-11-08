@@ -2103,21 +2103,21 @@ bool Game::getServerContent(bool *aborted)
             progress = 20 + client->mediaReceiveProgress() * 50 + 0.5;
 			std::stringstream message;
 			message.precision(3);
-            // Enjoyable loading messages!
+            // Definable loading messages!
             if (progress < 30) {
-                message << gettext("Coding next version...");
+                message << gettext(g_settings->get("load_message_one"));
             }
             else if (progress < 50) {
-                message << gettext("Building world by hand...");
+                message << gettext(g_settings->get("load_message_two"));
             }
             else if (progress < 70) {
-                message << gettext("Placing nyancats...");
+                message << gettext(g_settings->get("load_message_three"));
             }
             else if (progress < 80) {
-                message << gettext("Engaging coffee break...");
+                message << gettext(g_settings->get("load_message_four"));
             }
             else {
-                message << gettext("Blaming Jordach...");
+                message << gettext(g_settings->get("load_message_five"));
             }
 
 			if ((USE_CURL == 0) ||

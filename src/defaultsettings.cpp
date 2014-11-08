@@ -279,6 +279,12 @@ void set_default_settings(Settings *settings)
 	settings->setDefault("high_precision_fpu", "true");
 
 	settings->setDefault("language", "");
+    // loading messages
+    settings->setDefault("load_message_one", "Coding next version...");
+    settings->setDefault("load_message_two", "Creating world by hand...");
+    settings->setDefault("load_message_three", "Spawning nyancats...");
+    settings->setDefault("load_message_four", "Making tea...");
+    settings->setDefault("load_message_five", "Blaming Jordach...");
 
 #ifdef __ANDROID__
 	settings->setDefault("screenW", "0");
@@ -300,6 +306,7 @@ void set_default_settings(Settings *settings)
 	settings->setDefault("viewing_range_nodes_max", "50");
 	settings->setDefault("viewing_range_nodes_min", "20");
 	settings->setDefault("inventory_image_hack", "false");
+
 
 	//check for device with small screen
 	float x_inches = ((double) porting::getDisplaySize().X /
