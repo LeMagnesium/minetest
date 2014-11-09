@@ -2105,19 +2105,19 @@ bool Game::getServerContent(bool *aborted)
 			message.precision(3);
             // Definable loading messages!
             if (progress < 30) {
-                message << gettext(g_settings->get("load_message_one"));
+                message << g_settings->get("load_message_one");
             }
             else if (progress < 50) {
-                message << gettext(g_settings->get("load_message_two"));
+                message << g_settings->get("load_message_two");
             }
             else if (progress < 70) {
-                message << gettext(g_settings->get("load_message_three"));
+                message << g_settings->get("load_message_three");
             }
             else if (progress < 80) {
-                message << gettext(g_settings->get("load_message_four"));
+                message << g_settings->get("load_message_four");
             }
             else {
-                message << gettext(g_settings->get("load_message_five"));
+                message << g_settings->get("load_message_five");
             }
 
 			if ((USE_CURL == 0) ||
