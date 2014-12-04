@@ -1250,7 +1250,7 @@ PlayerSAO* Server::StageTwoClientInit(u16 peer_id)
 				name = narrow_to_wide(player->getName());
 
 			std::wstring message;
-			message += L"*** ";
+			message += L"[+] ";
 			message += name;
 			message += L" joined the game.";
 			SendChatMessage(PEER_ID_INEXISTENT,message);
@@ -1473,7 +1473,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		if (playername_length == PLAYERNAME_SIZE) {
 			actionstream<<"Server: Player with name exceeding max length "
 					<<"tried to connect from "<<addr_s<<std::endl;
-			DenyAccess(peer_id, L"Name too long");
+			DenyAccess(peer_id, L"Your username is too long.");
 			return;
 		}
 
@@ -1482,7 +1482,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		{
 			actionstream<<"Server: Player with an empty name "
 					<<"tried to connect from "<<addr_s<<std::endl;
-			DenyAccess(peer_id, L"Empty name");
+			DenyAccess(peer_id, L"Please specify a username.");
 			return;
 		}
 
@@ -1490,7 +1490,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		{
 			actionstream<<"Server: Player with an invalid name "
 					<<"tried to connect from "<<addr_s<<std::endl;
-			DenyAccess(peer_id, L"Name contains unallowed characters");
+			DenyAccess(peer_id, L"That username contains characters that aren't allowed.");
 			return;
 		}
 
@@ -1498,7 +1498,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		{
 			actionstream<<"Server: Player with the name \"singleplayer\" "
 					<<"tried to connect from "<<addr_s<<std::endl;
-			DenyAccess(peer_id, L"Name is not allowed");
+			DenyAccess(peer_id, L"Nice try.");
 			return;
 		}
 
@@ -1553,7 +1553,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 			actionstream<<"Server: "<<playername<<" tried to join, but there"
 					<<" are already max_users="
 					<<g_settings->getU16("max_users")<<" players."<<std::endl;
-			DenyAccess(peer_id, L"Too many users.");
+			DenyAccess(peer_id, L"I'm sorry, there are too many players online right now.");
 			return;
 		}
 
@@ -1595,7 +1595,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		if(given_password != checkpwd){
 			actionstream<<"Server: "<<playername<<" supplied wrong password"
 					<<std::endl;
-			DenyAccess(peer_id, L"Wrong password");
+			DenyAccess(peer_id, L"Password incorrect.");
 			return;
 		}
 
@@ -1695,8 +1695,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		// Warnings about protocol version can be issued here
 		if(getClient(peer_id)->net_proto_version < LATEST_PROTOCOL_VERSION)
 		{
-			SendChatMessage(peer_id, L"# Server: WARNING: YOUR CLIENT'S "
-					L"VERSION MAY NOT BE FULLY COMPATIBLE WITH THIS SERVER!");
+			SendChatMessage(peer_id, L"*** WARNING: Your client may be incompatible with this server.");
 		}
 
 		return;
@@ -2127,9 +2126,9 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 			message = message.substr(1);
 			send_to_sender_only = true;
 			if(message.length() == 0)
-				line += L"-!- Empty command";
+				line += L"-!- A forward slash on its own won't do much.";
 			else
-				line += L"-!- Invalid command: " + str_split(message, L' ')[0];
+				line += L"-!- I'm sorry, I haven't the foggiest what /" + str_split(message, L' ')[0] + L" is.";
 		}
 		else
 		{
@@ -2139,7 +2138,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 				line += L"> ";
 				line += message;
 			} else {
-				line += L"-!- You don't have permission to shout.";
+				line += L"-!- You are currently silenced.";
 				send_to_sender_only = true;
 			}
 		}
@@ -2235,7 +2234,7 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		if(!base64_is_valid(newpwd)){
 			infostream<<"Server: "<<player->getName()<<" supplied invalid password hash"<<std::endl;
 			// Wrong old password supplied!!
-			SendChatMessage(peer_id, L"Invalid new password hash supplied. Password NOT changed.");
+			SendChatMessage(peer_id, L"*** Password NOT changed: Invalid new password hash supplied.");
 			return;
 		}
 
@@ -2251,18 +2250,18 @@ void Server::ProcessData(u8 *data, u32 datasize, u16 peer_id)
 		{
 			infostream<<"Server: invalid old password"<<std::endl;
 			// Wrong old password supplied!!
-			SendChatMessage(peer_id, L"Invalid old password supplied. Password NOT changed.");
+			SendChatMessage(peer_id, L"*** Password NOT changed: Invalid old password.");
 			return;
 		}
 
 		bool success = m_script->setPassword(playername, newpwd);
 		if(success){
 			actionstream<<player->getName()<<" changes password"<<std::endl;
-			SendChatMessage(peer_id, L"Password change successful.");
+			SendChatMessage(peer_id, L"*** Password change successful.");
 		} else {
 			actionstream<<player->getName()<<" tries to change password but "
 					<<"it fails"<<std::endl;
-			SendChatMessage(peer_id, L"Password change failed or inavailable.");
+			SendChatMessage(peer_id, L"*** Password change failed or unavailable.");
 		}
 	}
 	else if(command == TOSERVER_PLAYERITEM)
@@ -4335,7 +4334,7 @@ void Server::DeleteClient(u16 peer_id, ClientDeletionReason reason)
 			if(player != NULL && reason != CDR_DENY)
 			{
 				std::wstring name = narrow_to_wide(player->getName());
-				message += L"*** ";
+				message += L"[-] ";
 				message += name;
 				message += L" left the game.";
 				if(reason == CDR_TIMEOUT)
@@ -4446,16 +4445,16 @@ PlayerSAO* Server::getPlayerSAO(u16 peer_id)
 std::wstring Server::getStatusString()
 {
 	std::wostringstream os(std::ios_base::binary);
-	os<<L"# Server: ";
+	os<<L"# Welcome to this Minetest server! "<<std::endl;
 	// Version
-	os<<L"version="<<narrow_to_wide(minetest_version_simple);
+	os<<L"# I am running Minetest version "<<narrow_to_wide(minetest_version_simple);
 	// Uptime
-	os<<L", uptime="<<m_uptime.get();
+	os<<L", uptime: "<<m_uptime.get()<<std::endl;
 	// Max lag estimate
-	os<<L", max_lag="<<m_env->getMaxLagEstimate();
+	os<<L"# Lag estimate: "<<m_env->getMaxLagEstimate()<<std::endl;
 	// Information about clients
 	bool first = true;
-	os<<L", clients={";
+	os<<L"# Connected players: ";
 	std::list<u16> clients = m_clients.getClientIDs();
 	for(std::list<u16>::iterator i = clients.begin();
 		i != clients.end(); ++i)
@@ -4468,12 +4467,11 @@ std::wstring Server::getStatusString()
 			name = narrow_to_wide(player->getName());
 		// Add name to information string
 		if(!first)
-			os<<L",";
+			os<<L", ";
 		else
 			first = false;
 		os<<name;
 	}
-	os<<L"}";
 	if(((ServerMap*)(&m_env->getMap()))->isSavingEnabled() == false)
 		os<<std::endl<<L"# Server: "<<" WARNING: Map saving is disabled.";
 	if(g_settings->get("motd") != "")
